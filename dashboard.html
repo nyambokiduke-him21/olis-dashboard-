@@ -1,93 +1,863 @@
 <!doctype html>
-<html>
+
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>OLIS Mini — R23 Live Shadow</title>
-<style>
-body{margin:0;background:#09111d;color:#edf2f7;font-family:Arial,sans-serif}
-.wrap{max-width:1250px;margin:auto;padding:18px}
-header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
-h1{margin:0;font-size:25px}.sub{color:#9aa9bc;margin-top:5px}
-.live{padding:8px 12px;border-radius:20px;background:#153525;color:#62e38f;font-weight:bold}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
-.card,.panel{background:#111d2d;border:1px solid #24344a;border-radius:14px}
-.card{padding:15px}.label{color:#91a0b4;font-size:12px;text-transform:uppercase}.value{font-size:27px;font-weight:bold;margin-top:6px}
-.panel{padding:16px;margin-bottom:16px}h2{margin:0 0 14px}
-table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #26364b;text-align:left}
-th{color:#91a0b4;font-size:12px;text-transform:uppercase}
-.pill{display:inline-block;padding:5px 8px;border-radius:9px;background:#19283b}
-.bet{color:#63e38f;font-weight:bold}.no{color:#9aa9bc}.watch{color:#f0bd54;font-weight:bold}
-.rec{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.recbox{padding:16px;border-radius:12px;background:#172438;border-left:5px solid #2fba6d}
-.recbox.no{border-left-color:#d45151}.recbox.watch{border-left-color:#e6ad42}
-.big{font-size:20px;font-weight:bold;margin:7px 0}
-@media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.rec{grid-template-columns:1fr}table{font-size:12px}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header><div><h1>OLIS MINI — R23 Live Shadow Dashboard</h1>
-<div class="sub">Remote live-shadow monitor • paper only • no guaranteed outcomes</div></div>
-<div class="live">● LIVE SHADOW</div></header>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09111d">
+<title>OLIS MINI — R23 Live Shadow</title>
 
-<div class="cards">
-<div class="card"><div class="label">Capture</div><div class="value" id="cid">1</div></div>
-<div class="card"><div class="label">Fixtures</div><div class="value" id="fixtures">0 / 10</div></div>
-<div class="card"><div class="label">Qualified signals</div><div class="value" id="bets">0</div></div>
-<div class="card"><div class="label">Status</div><div class="value" id="status">WAITING</div></div>
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:#070d16;
+    color:#edf2f7;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+.wrap{
+    width:100%;
+    max-width:1250px;
+    margin:auto;
+    padding:16px;
+}
+
+/* HEADER */
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.brand h1{
+    margin:0;
+    font-size:24px;
+    letter-spacing:.2px;
+}
+
+.sub{
+    color:#8494a9;
+    font-size:13px;
+    margin-top:5px;
+}
+
+.live{
+    background:#123523;
+    color:#61e18d;
+    border:1px solid #1e6640;
+    padding:8px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+/* SUMMARY */
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-bottom:16px;
+}
+
+.card{
+    background:#101a28;
+    border:1px solid #213147;
+    border-radius:14px;
+    padding:14px;
+}
+
+.label{
+    color:#8292a7;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.value{
+    margin-top:6px;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.status-live{
+    color:#61e18d;
+}
+
+/* PANELS */
+
+.panel{
+    background:#101a28;
+    border:1px solid #213147;
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:15px;
+}
+
+.panel h2{
+    margin:0 0 13px;
+    font-size:17px;
+}
+
+/* BEST SIGNALS */
+
+.signals{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.signal{
+    background:#162234;
+    border:1px solid #273b54;
+    border-radius:13px;
+    padding:14px;
+}
+
+.signal.active{
+    border-color:#36c979;
+    background:#10291d;
+}
+
+.signal-title{
+    color:#8c9bb0;
+    font-size:11px;
+    text-transform:uppercase;
+}
+
+.signal-match{
+    font-size:16px;
+    font-weight:bold;
+    margin:7px 0;
+    line-height:1.3;
+}
+
+.signal-data{
+    color:#c7d1dd;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.bet{
+    color:#61e18d;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+.no-bet{
+    color:#7f8da0;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+/* FIXTURE CARDS */
+
+.fixtures{
+    display:grid;
+    gap:10px;
+}
+
+.fixture{
+    background:#121f30;
+    border:1px solid #26384e;
+    border-radius:14px;
+    padding:14px;
+}
+
+.fixture-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.fixture-number{
+    color:#7f90a6;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.match{
+    font-size:16px;
+    font-weight:bold;
+    line-height:1.35;
+}
+
+.market-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin-top:10px;
+}
+
+.market{
+    background:#0c1521;
+    border:1px solid #233349;
+    border-radius:9px;
+    padding:9px 7px;
+}
+
+.market-name{
+    color:#8292a7;
+    font-size:10px;
+    text-transform:uppercase;
+}
+
+.market-value{
+    font-size:13px;
+    font-weight:bold;
+    margin-top:4px;
+}
+
+.market-edge{
+    font-size:11px;
+    margin-top:2px;
+    color:#8b9aae;
+}
+
+.fixture-decision{
+    margin-top:10px;
+    padding:9px;
+    border-radius:9px;
+    background:#0c1521;
+    color:#8391a4;
+    font-size:12px;
+    font-weight:bold;
+    text-align:center;
+}
+
+.fixture-decision.bet{
+    background:#123523;
+    color:#61e18d;
+}
+
+/* FOOTER */
+
+.footer{
+    color:#637287;
+    text-align:center;
+    font-size:11px;
+    padding:8px 0 15px;
+}
+
+/* TABLE FOR DESKTOP */
+
+.desktop-table{
+    display:none;
+}
+
+@media(min-width:900px){
+
+    .fixtures{
+        display:none;
+    }
+
+    .desktop-table{
+        display:block;
+        overflow-x:auto;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    th,td{
+        padding:10px;
+        border-bottom:1px solid #24354a;
+        text-align:left;
+    }
+
+    th{
+        color:#8292a7;
+        font-size:11px;
+        text-transform:uppercase;
+    }
+
+    td{
+        font-size:13px;
+    }
+
+    .summary{
+        gap:12px;
+    }
+}
+
+/* TABLET */
+
+@media(max-width:899px){
+
+    .summary{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .signals{
+        grid-template-columns:1fr;
+    }
+}
+
+/* PHONE */
+
+@media(max-width:520px){
+
+    .wrap{
+        padding:11px;
+    }
+
+    header{
+        align-items:flex-start;
+    }
+
+    .brand h1{
+        font-size:19px;
+    }
+
+    .sub{
+        font-size:11px;
+    }
+
+    .live{
+        padding:7px 9px;
+        font-size:10px;
+    }
+
+    .card{
+        padding:11px;
+    }
+
+    .value{
+        font-size:20px;
+    }
+
+    .panel{
+        padding:11px;
+        border-radius:13px;
+    }
+
+    .panel h2{
+        font-size:15px;
+    }
+
+    .match{
+        font-size:15px;
+    }
+
+    .market-grid{
+        gap:5px;
+    }
+
+    .market{
+        padding:8px 5px;
+    }
+
+    .market-value{
+        font-size:12px;
+    }
+
+    .market-edge{
+        font-size:10px;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header>
+
+```
+<div class="brand">
+    <h1>OLIS MINI</h1>
+    <div class="sub">R23 Live Shadow Dashboard</div>
 </div>
 
-<section class="panel"><h2>Best Qualified Signals</h2><div class="rec">
-<div class="recbox no" id="bestgg"><div class="label">GG</div><div class="big">NO BET</div><div>Waiting for qualified signal.</div></div>
-<div class="recbox no" id="besto25"><div class="label">O2.5</div><div class="big">NO BET</div><div>Waiting for qualified signal.</div></div>
-<div class="recbox no" id="besto35"><div class="label">O3.5</div><div class="big">NO BET</div><div>Only shown when sufficiently supported.</div></div>
-</div></section>
+<div class="live">● LIVE SHADOW</div>
+```
 
-<section class="panel"><h2>Current Capture</h2>
-<table><thead><tr><th>#</th><th>Fixture</th><th>GG</th><th>O2.5</th><th>O3.5</th><th>Decision</th></tr></thead>
-<tbody id="rows"></tbody></table></section>
+</header>
+
+<!-- SUMMARY -->
+
+<div class="summary">
+
+```
+<div class="card">
+    <div class="label">Capture</div>
+    <div class="value" id="cid">—</div>
+</div>
+
+<div class="card">
+    <div class="label">Fixtures</div>
+    <div class="value" id="fixtures">0 / 10</div>
+</div>
+
+<div class="card">
+    <div class="label">Signals</div>
+    <div class="value" id="bets">0</div>
+</div>
+
+<div class="card">
+    <div class="label">Status</div>
+    <div class="value status-live" id="status">WAITING</div>
+</div>
+```
+
+</div>
+
+<!-- BEST SIGNALS -->
+
+<section class="panel">
+
+<h2>Best Qualified Signals</h2>
+
+<div class="signals">
+
+```
+<div class="signal" id="bestgg">
+    <div class="signal-title">GG</div>
+    <div class="signal-match">NO BET</div>
+    <div class="signal-data">
+        No sufficiently qualified signal.
+    </div>
+</div>
+
+
+<div class="signal" id="besto25">
+    <div class="signal-title">O2.5</div>
+    <div class="signal-match">NO BET</div>
+    <div class="signal-data">
+        No sufficiently qualified signal.
+    </div>
+</div>
+
+
+<div class="signal" id="besto35">
+    <div class="signal-title">O3.5</div>
+    <div class="signal-match">NO BET</div>
+    <div class="signal-data">
+        No sufficiently qualified signal.
+    </div>
+</div>
+```
+
+</div>
+
+</section>
+
+<!-- CURRENT FIXTURES -->
+
+<section class="panel">
+
+<h2>Current Capture</h2>
+
+<!-- MOBILE -->
+
+<div class="fixtures" id="mobileFixtures"></div>
+
+<!-- DESKTOP -->
+
+<div class="desktop-table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>#</th>
+<th>Fixture</th>
+<th>GG</th>
+<th>O2.5</th>
+<th>O3.5</th>
+<th>Decision</th>
+</tr>
+
+</thead>
+
+<tbody id="rows"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<div class="footer">
+OLIS MINI • Live shadow monitoring • Paper only • No guaranteed outcomes
+</div>
+
 </div>
 
 <script>
+
 const API_URL = window.OLIS_API_URL || "/api/live";
-const names = {GG:"GG",O25:"O2.5",O35:"O3.5"};
+
+const names = {
+    GG:"GG",
+    O25:"O2.5",
+    O35:"O3.5"
+};
+
 
 function bestMarket(fixtures,key){
-  let arr=[];
-  fixtures.forEach(f=>{
+
+    let arr=[];
+
+    fixtures.forEach(f=>{
+
+        const m=f.markets?.[key];
+
+        if(m && f.decision?.market===key){
+
+            arr.push({
+                f,
+                m
+            });
+
+        }
+
+    });
+
+    arr.sort(
+        (a,b)=>
+        (b.m.probability+b.m.edge) -
+        (a.m.probability+a.m.edge)
+    );
+
+    return arr[0] || null;
+}
+
+
+function renderSignal(id,item,key){
+
+    const el=document.getElementById(id);
+
+    if(!item){
+
+        el.className="signal";
+
+        el.innerHTML=`
+
+            <div class="signal-title">
+                ${names[key]}
+            </div>
+
+            <div class="signal-match">
+                NO BET
+            </div>
+
+            <div class="signal-data">
+                No sufficiently qualified signal.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    el.className="signal active";
+
+    el.innerHTML=`
+
+        <div class="signal-title">
+            ${names[key]}
+        </div>
+
+        <div class="signal-match">
+            ${item.f.home} vs ${item.f.away}
+        </div>
+
+        <div class="signal-data">
+            Probability:
+            <b>${item.m.probability.toFixed(2)}%</b>
+            <br>
+
+            Edge:
+            <b>${item.m.edge.toFixed(2)}%</b>
+        </div>
+
+        <div class="bet">
+            SHADOW BET
+        </div>
+
+    `;
+
+}
+
+
+function marketHTML(f,key){
+
     const m=f.markets?.[key];
-    if(m && f.decision?.market===key) arr.push({f,m});
-  });
-  arr.sort((a,b)=>(b.m.probability+b.m.edge)-(a.m.probability+a.m.edge));
-  return arr[0]||null;
+
+    if(!m){
+
+        return `
+        <div class="market">
+            <div class="market-name">${names[key]}</div>
+            <div class="market-value">—</div>
+        </div>
+        `;
+
+    }
+
+    return `
+    <div class="market">
+
+        <div class="market-name">
+            ${names[key]}
+        </div>
+
+        <div class="market-value">
+            ${m.probability.toFixed(2)}%
+        </div>
+
+        <div class="market-edge">
+            Edge ${m.edge.toFixed(2)}%
+        </div>
+
+    </div>
+    `;
+
 }
-function renderBox(id,item,key){
-  const el=document.getElementById(id);
-  if(!item){el.className="recbox no";el.innerHTML=`<div class="label">${names[key]}</div><div class="big">NO BET</div><div>No sufficiently qualified signal.</div>`;return;}
-  el.className="recbox";
-  el.innerHTML=`<div class="label">${names[key]}</div><div class="big">${item.f.home} vs ${item.f.away}</div><div>${item.m.probability.toFixed(2)}% probability • ${item.m.edge.toFixed(2)}% edge</div><div class="bet">SHADOW BET</div>`;
+
+
+function renderMobile(fixtures){
+
+    const container=
+        document.getElementById("mobileFixtures");
+
+    container.innerHTML=
+        fixtures.map(f=>{
+
+            const decision=
+                f.decision?.market
+                ? `
+                    <div class="fixture-decision bet">
+                        ${names[f.decision.market]}
+                        — SHADOW BET
+                    </div>
+                  `
+                : `
+                    <div class="fixture-decision">
+                        NO BET
+                    </div>
+                  `;
+
+            return `
+
+            <div class="fixture">
+
+                <div class="fixture-top">
+
+                    <div class="fixture-number">
+                        FIXTURE #${f.number}
+                    </div>
+
+                </div>
+
+                <div class="match">
+                    ${f.home}
+                    <br>
+                    <span style="color:#718197;font-size:12px">
+                        VS
+                    </span>
+                    <br>
+                    ${f.away}
+                </div>
+
+
+                <div class="market-grid">
+
+                    ${marketHTML(f,"GG")}
+                    ${marketHTML(f,"O25")}
+                    ${marketHTML(f,"O35")}
+
+                </div>
+
+                ${decision}
+
+            </div>
+
+            `;
+
+        }).join("");
+
 }
+
+
+function renderDesktop(fixtures){
+
+    const body=
+        document.getElementById("rows");
+
+    body.innerHTML=
+        fixtures.map(f=>{
+
+            const market=k=>{
+
+                const m=f.markets?.[k];
+
+                return m
+                    ? `
+                    <span>
+                        ${m.probability.toFixed(2)}%
+                        /
+                        ${m.edge.toFixed(2)}%
+                    </span>
+                    `
+                    : "—";
+
+            };
+
+
+            const decision=
+                f.decision?.market
+                ? `
+                    <span class="bet">
+                        ${names[f.decision.market]}
+                        — SHADOW BET
+                    </span>
+                  `
+                : `
+                    <span class="no-bet">
+                        NO BET
+                    </span>
+                  `;
+
+
+            return `
+
+            <tr>
+
+                <td>${f.number}</td>
+
+                <td>
+                    <b>${f.home} vs ${f.away}</b>
+                </td>
+
+                <td>${market("GG")}</td>
+                <td>${market("O25")}</td>
+                <td>${market("O35")}</td>
+
+                <td>${decision}</td>
+
+            </tr>
+
+            `;
+
+        }).join("");
+
+}
+
+
 async function refresh(){
- try{
-  const r=await fetch(API_URL+"?t="+Date.now(),{cache:"no-store"});
-  const d=await r.json();
-  document.getElementById("cid").textContent=d.capture_id||1;
-  document.getElementById("fixtures").textContent=(d.fixtures?.length||0)+" / 10";
-  document.getElementById("bets").textContent=d.summary?.qualified_signals||0;
-  document.getElementById("status").textContent=d.fixtures?.length===10?"LIVE":"WAITING";
-  const body=document.getElementById("rows");
-  body.innerHTML=(d.fixtures||[]).map(f=>{
-    const m=k=>f.markets?.[k]?`${f.markets[k].probability.toFixed(2)}% / ${f.markets[k].edge.toFixed(2)}%`:"—";
-    const decision=f.decision?.market ? `<span class="bet">${names[f.decision.market]} — SHADOW BET</span>`:"<span class='no'>NO BET</span>";
-    return `<tr><td>${f.number}</td><td><b>${f.home} vs ${f.away}</b></td><td><span class="pill">${m("GG")}</span></td><td><span class="pill">${m("O25")}</span></td><td><span class="pill">${m("O35")}</span></td><td>${decision}</td></tr>`;
-  }).join("");
-  renderBox("bestgg",bestMarket(d.fixtures||[],"GG"),"GG");
-  renderBox("besto25",bestMarket(d.fixtures||[],"O25"),"O25");
-  renderBox("besto35",bestMarket(d.fixtures||[],"O35"),"O35");
- }catch(e){document.getElementById("status").textContent="OFFLINE";}
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL + "?t=" + Date.now(),
+                {
+                    cache:"no-store"
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "HTTP " + response.status
+            );
+
+        }
+
+
+        const data=
+            await response.json();
+
+
+        const fixtures=
+            data.fixtures || [];
+
+
+        document.getElementById("cid")
+            .textContent=
+            data.capture_id ?? "—";
+
+
+        document.getElementById("fixtures")
+            .textContent=
+            `${fixtures.length} / 10`;
+
+
+        document.getElementById("bets")
+            .textContent=
+            data.summary?.qualified_signals ?? 0;
+
+
+        document.getElementById("status")
+            .textContent=
+            fixtures.length===10
+            ? "LIVE"
+            : "WAITING";
+
+
+        renderMobile(fixtures);
+
+        renderDesktop(fixtures);
+
+
+        renderSignal(
+            "bestgg",
+            bestMarket(fixtures,"GG"),
+            "GG"
+        );
+
+
+        renderSignal(
+            "besto25",
+            bestMarket(fixtures,"O25"),
+            "O25"
+        );
+
+
+        renderSignal(
+            "besto35",
+            bestMarket(fixtures,"O35"),
+            "O35"
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "OLIS dashboard error:",
+            error
+        );
+
+        document.getElementById("status")
+            .textContent="OFFLINE";
+
+    }
+
 }
-refresh(); setInterval(refresh,3000);
+
+
+refresh();
+
+setInterval(refresh,3000);
+
 </script>
+
 </body>
 </html>
